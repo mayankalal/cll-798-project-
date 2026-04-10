@@ -1,0 +1,549 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{float}
+\geometry{margin=1in}
+\usepackage{placeins}
+\usepackage{subcaption}
+\title{\textbf{Emergent Dynamics of Hospital Patient Flow:\
+A Complexity Science Approach to Criticality, Avalanches, and System Collapse}}
+
+\author{
+Mayan Kalal\\
+Complexity Science in Chemical Industry (CLL798) \\
+Instructor: Rajesh Khanna
+}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Hospitals operate as complex adaptive systems where global performance emerges from the interaction of stochastic demand, limited capacity, and decentralized decision-making. In this study, a computational model is developed to investigate patient flow dynamics under varying load and behavioral conditions. The model incorporates random patient arrivals, finite bed capacity, and discharge processes influenced by both systemic congestion and local inefficiencies.
+
+Four distinct scenarios are simulated by varying arrival rate and behavioral parameters. The results reveal the existence of multiple dynamical regimes: a stable regime with negligible congestion, a near-critical regime characterized by intermittent fluctuations, and a super-critical regime exhibiting persistent overload. Avalanche-like events, defined as sudden increases in queue size, emerge as the system approaches capacity limits.
+
+The study demonstrates that system-wide failures are not caused by isolated factors, but arise from the interaction between structural constraints and local decision-making. These findings highlight the importance of complexity-based approaches in understanding and managing healthcare systems.
+\end{abstract}
+
+\section{Introduction}
+
+Efficient patient flow is a critical requirement for the functioning of healthcare systems. However, hospitals frequently experience congestion, delays, and sudden breakdowns in service despite the presence of structured protocols and resource planning. These issues are often attributed to factors such as limited capacity, uneven demand, and operational inefficiencies. However, such explanations fail to fully capture the underlying dynamics of the system.
+
+Traditional approaches to analyzing hospital performance rely on linear cause-effect relationships, where individual factors are studied in isolation. In practice, hospital systems exhibit nonlinear behavior, where small changes in demand or decision-making can lead to disproportionately large effects. For example, a minor delay in discharge can propagate through the system, leading to overcrowding in emergency departments and reduced system efficiency.
+
+These characteristics indicate that hospitals function as \textit{complex adaptive systems}, where global behavior emerges from the interaction of multiple interconnected components. Such systems are governed by feedback loops, stochastic fluctuations, and decentralized decision-making, making their behavior difficult to predict using conventional methods.
+
+Complexity science provides a suitable framework to analyze such systems. Concepts such as emergence, nonlinearity, and self-organized criticality allow us to understand how local interactions can produce large-scale system behavior. In particular, systems operating near capacity often exhibit cascade phenomena, where small disturbances can trigger large-scale disruptions.
+
+In this study, we develop a computational model of hospital patient flow to investigate how congestion and avalanche-like events arise from simple local rules. The model incorporates stochastic patient arrivals, finite bed capacity, and discharge dynamics influenced by both systemic conditions and behavioral factors. By simulating different operating conditions, we aim to identify distinct regimes of system behavior and understand the mechanisms leading to instability and collapse.
+\section{Model Description}
+
+\subsection{System Representation}
+
+The hospital system is modeled as a discrete-time flow system in which patients move through different stages of care under capacity constraints. The system consists of three primary components: an entry queue (representing the emergency department), a finite-capacity bed system (representing hospital wards), and a discharge process through which patients exit the system.
+
+At each time step, the system state evolves based on patient arrivals, admissions, and discharges. This simplified representation captures the essential dynamics of hospital flow while allowing systematic analysis of emergent behavior.
+
+\subsection{Agents and State Variables}
+
+The primary agents in the system are patients. Each patient can exist in one of three states:
+\begin{itemize}
+\item Waiting in the queue
+\item Admitted and occupying a bed
+\item Discharged from the system
+\end{itemize}
+
+The system is described using the following state variables:
+
+\begin{itemize}
+\item $Q(t)$: Number of patients waiting in the queue at time $t$
+\item $O(t)$: Number of occupied beds at time $t$
+\item $B$: Total number of beds (fixed capacity)
+\end{itemize}
+
+These variables dynamically evolve and determine the overall system behavior.
+
+\subsection{Connectivity Structure}
+
+The system exhibits a structured connectivity through patient flow:
+
+[
+\text{Queue} \rightarrow \text{Admission} \rightarrow \text{Beds} \rightarrow \text{Discharge}
+]
+
+Each stage is interdependent. Admission depends on both queue size and available beds, while discharge influences future admissions. This connectivity allows local changes in one part of the system to propagate and influence the entire system.
+
+\subsection{Noise and Stochastic Inputs}
+
+The system incorporates stochasticity through random patient arrivals. At each time step, the number of arriving patients is modeled using a Poisson distribution:
+
+\begin{equation}
+A(t) \sim \text{Poisson}(\lambda)
+\end{equation}
+
+where $\lambda$ represents the average arrival rate.
+
+This stochastic input introduces variability in system demand, reflecting real-world uncertainty in patient inflow. Noise plays a critical role in triggering fluctuations and potential cascade events.
+
+\vspace{0.3cm}
+
+\subsection{Admission Dynamics}
+
+Patients from the queue are admitted based on bed availability. The number of patients admitted at time $t$ is given by:
+
+\begin{equation}
+\text{Admit}(t) = \min(Q(t), B - O(t))
+\end{equation}
+
+This ensures that admissions are constrained by both demand and available capacity.
+
+\vspace{0.3cm}
+
+\subsection{Discharge Dynamics and Behavioral Effects}
+
+The discharge process is governed by both system-level constraints and local decision-making behavior.
+
+The baseline discharge rate is proportional to bed occupancy:
+
+\begin{equation}
+D_{\text{base}}(t) = \frac{O(t)}{\text{average stay time}}
+\end{equation}
+
+To incorporate behavioral inefficiencies, a parameter $\alpha$ is introduced. This parameter represents delays in discharge decisions due to local optimization or operational constraints.
+
+Additionally, a congestion feedback mechanism is introduced using parameter $\beta$, which reduces discharge efficiency as occupancy increases. The effective discharge rate is defined as:
+
+\begin{equation}
+D(t) = D_{\text{base}}(t) \times (1 - \alpha) \times \left(1 - \beta \cdot \frac{O(t)}{B}\right)
+\end{equation}
+
+This formulation captures the combined effect of behavioral and systemic factors on patient flow.
+
+\vspace{0.3cm}
+
+\subsection{Avalanche Definition}
+
+An avalanche is defined as a sudden increase in queue size, representing a cascade event in the system. The avalanche size at time $t$ is given by:
+
+\begin{equation}
+s(t) = Q(t) - Q(t-1)
+\end{equation}
+
+Positive values of $s(t)$ correspond to congestion events where the system temporarily fails to process incoming demand efficiently.
+
+\vspace{0.3cm}
+
+\subsection{Complex System Characteristics}
+
+The model exhibits key features of complex systems:
+
+\begin{itemize}
+\item \textbf{Nonlinearity:} Small changes in arrival or discharge rates can produce large variations in queue size.
+\item \textbf{Feedback Loops:} High occupancy reduces discharge efficiency, which further increases occupancy.
+\item \textbf{Emergence:} Global congestion patterns arise from simple local interactions.
+\item \textbf{Sensitivity to Load:} System behavior changes significantly as demand approaches capacity.
+\end{itemize}
+\section{Simulation Methodology}
+
+\subsection{Simulation Framework}
+
+The hospital system is simulated in discrete time steps, where the system state is updated sequentially based on arrivals, admissions, and discharges. The simulation captures the dynamic evolution of queue size and bed occupancy under varying conditions.
+
+At each time step $t$, the system undergoes the following sequence of updates.
+
+\subsection{Algorithmic Steps}
+
+\textbf{Step 1: Patient Arrival}
+
+At each time step, new patients arrive according to a Poisson process:
+
+\begin{equation}
+A(t) \sim \text{Poisson}(\lambda)
+\end{equation}
+
+These patients are added to the queue:
+
+\begin{equation}
+Q(t) = Q(t-1) + A(t)
+\end{equation}
+
+\textbf{Step 2: Admission Process}
+
+Patients are admitted from the queue based on bed availability:
+
+\begin{equation}
+\text{Admit}(t) = \min(Q(t), B - O(t))
+\end{equation}
+
+The system state is updated as:
+
+\begin{equation}
+Q(t) = Q(t) - \text{Admit}(t)
+\end{equation}
+
+\begin{equation}
+O(t) = O(t) + \text{Admit}(t)
+\end{equation}
+
+\textbf{Step 3: Discharge Process}
+
+The baseline discharge rate is computed as:
+
+\begin{equation}
+D_{\text{base}}(t) = \frac{O(t)}{\text{average stay time}}
+\end{equation}
+
+The effective discharge is then adjusted using behavioral and congestion factors:
+
+\begin{equation}
+D(t) = D_{\text{base}}(t) \times (1 - \alpha) \times \left(1 - \beta \cdot \frac{O(t)}{B}\right)
+\end{equation}
+
+The occupancy is updated as:
+
+\begin{equation}
+O(t) = O(t) - D(t)
+\end{equation}
+
+\textbf{Step 4: State Recording}
+
+At each time step, the following variables are recorded:
+\begin{itemize}
+\item Queue size $Q(t)$
+\item Bed occupancy $O(t)$
+\end{itemize}
+
+These time series are used for further analysis.
+
+\textbf{Step 5: Avalanche Detection}
+
+Avalanches are detected by measuring the change in queue size between consecutive time steps:
+
+\begin{equation}
+s(t) = Q(t) - Q(t-1)
+\end{equation}
+
+Positive values of $s(t)$ are recorded as avalanche events.
+
+\subsection{Simulation Parameters}
+
+The simulation is performed using the following parameters:
+
+\begin{itemize}
+\item Total simulation time: $T = 5000$
+\item Bed capacity: $B = 100$
+\item Average stay time: fixed constant
+\item Arrival rate: $\lambda = 3, 5, 6$
+\item Behavioral parameter: $\alpha = 0, 0.2$
+\item Congestion parameter: $\beta = 0.5$
+\end{itemize}
+
+\subsection{Scenarios Simulated}
+
+To analyze system behavior under different conditions, four scenarios are considered:
+
+\begin{itemize}
+\item Low load, no behavioral inefficiency: $(\lambda = 3, \alpha = 0)$
+\item Low load with behavioral inefficiency: $(\lambda = 3, \alpha = 0.2)$
+\item Moderate load: $(\lambda = 5, \alpha = 0)$
+\item High load with behavioral inefficiency: $(\lambda = 6, \alpha = 0.2)$
+\end{itemize}
+
+These scenarios allow systematic exploration of the effects of load and behavior on system dynamics.
+
+\section{Results and Analysis}
+
+The system behavior is analyzed under four different scenarios by varying arrival rate ($\lambda$) and behavioral inefficiency ($\alpha$). Each case is evaluated using queue size, bed occupancy, and avalanche size distribution to understand system dynamics.
+
+\subsection{Case 1: Low Load without Behavioral Inefficiency ($\lambda = 3$, $\alpha = 0$)}
+
+Under low load and ideal behavior, the system operates in a stable regime. The queue remains negligible, and bed occupancy stays well below capacity. The avalanche distribution confirms the absence of cascade behavior, indicating a sub-critical regime.
+
+% ---- FIRST FIGURE (GOES ON SAME PAGE AS TEXT) ----
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.4\linewidth]{1.png}
+\caption{Queue size remains near zero under low load conditions.}
+\end{figure}
+
+\FloatBarrier
+
+% ---- SECOND FIGURE (NEXT PAGE) ----
+\begin{figure}[htbp]
+\centering
+
+\begin{subfigure}{0.4\linewidth}
+\centering
+\includegraphics[width=\linewidth]{2.png}
+\caption{Bed Occupancy}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.4\linewidth}
+\centering
+\includegraphics[width=\linewidth]{3.png}
+\caption{Avalanche Distribution}
+\end{subfigure}
+
+\caption{Bed occupancy remains within safe limits, and avalanche distribution shows absence of cascade events.}
+\end{figure}
+
+\FloatBarrier
+
+
+\subsection{Case 2: Low Load with Behavioral Inefficiency ($\lambda = 3$, $\alpha = 0.2$)}
+
+Introducing behavioral inefficiency leads to intermittent congestion. The queue exhibits small spikes due to delays in discharge.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}{0.45\linewidth}
+\centering
+\includegraphics[width=\linewidth]{4.png}
+\caption{Queue Size}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.45\linewidth}
+\centering
+\includegraphics[width=\linewidth]{5.png}
+\caption{Bed Occupancy}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}{0.6\linewidth}
+\centering
+\includegraphics[width=\linewidth]{6.png}
+\caption{Avalanche Distribution}
+\end{subfigure}
+
+\caption{Localized instability due to behavioral inefficiency.}
+\end{figure}
+
+The avalanche distribution shows small events, indicating localized but non-propagating disturbances.
+
+\FloatBarrier
+
+\subsection{Case 3: Moderate Load ($\lambda = 5$, $\alpha = 0$)}
+
+At moderate load, the system approaches criticality. The queue begins to fluctuate significantly, and occupancy frequently reaches high levels.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}{0.45\linewidth}
+\centering
+\includegraphics[width=\linewidth]{7.png}
+\caption{Queue Size}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.45\linewidth}
+\centering
+\includegraphics[width=\linewidth]{8.png}
+\caption{Bed Occupancy}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}{0.6\linewidth}
+\centering
+\includegraphics[width=\linewidth]{9.png}
+\caption{Avalanche Distribution}
+\end{subfigure}
+
+\caption{Near-critical regime showing strong fluctuations and emergence of avalanches.}
+\end{figure}
+
+The avalanche distribution becomes broader, indicating the emergence of cascade-like dynamics.
+
+\FloatBarrier
+
+\subsection{Case 4: High Load with Behavioral Inefficiency ($\lambda = 6$, $\alpha = 0.2$)}
+
+Under high load, the system enters a collapse regime. Bed occupancy saturates completely, and the queue grows continuously.
+
+\begin{figure}[H]
+\centering
+
+\begin{subfigure}{0.45\linewidth}
+\centering
+\includegraphics[width=\linewidth]{10.png}
+\caption{Queue Size}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.45\linewidth}
+\centering
+\includegraphics[width=\linewidth]{11.png}
+\caption{Bed Occupancy}
+\end{subfigure}
+
+\vspace{0.3cm}
+
+\begin{subfigure}{0.6\linewidth}
+\centering
+\includegraphics[width=\linewidth]{12.png}
+\caption{Avalanche Distribution}
+\end{subfigure}
+
+\caption{System collapse characterized by saturation and large cascade events.}
+\end{figure}
+
+The avalanche distribution shows larger events, reflecting strong cascade behavior and system instability.
+
+\FloatBarrier
+
+\subsection{Overall Transition}
+
+The results demonstrate a clear transition:
+
+\begin{itemize}
+\item Stable regime at low load
+\item Localized instability with inefficiency
+\item Near-critical behavior at moderate load
+\item Collapse under high load
+\end{itemize}
+
+This confirms that system behavior is governed by demand-capacity balance, while behavioral inefficiencies amplify instability.
+\section{Avalanche Analysis and Self-Organized Criticality}
+
+\subsection{Avalanche Size Distribution}
+
+Avalanche events are defined as positive changes in queue size between consecutive time steps:
+
+\begin{equation}
+s(t) = Q(t) - Q(t-1)
+\end{equation}
+
+These events represent temporary imbalances between incoming demand and system capacity. The distribution of avalanche sizes provides insight into the stability and responsiveness of the system.
+
+In the low-load regime ($\lambda = 3$, $\alpha = 0$), avalanche activity is negligible. The queue remains near zero, and fluctuations are minimal. This indicates that the system is operating far from criticality, with sufficient capacity to absorb stochastic variations.
+
+When behavioral inefficiency is introduced ($\lambda = 3$, $\alpha = 0.2$), small avalanche events begin to appear. These events are localized and short-lived, suggesting that inefficiencies introduce disturbances but do not propagate through the system.
+
+At moderate load ($\lambda = 5$, $\alpha = 0$), the avalanche distribution becomes broader. Events of varying sizes are observed, indicating that the system is approaching a critical state. In this regime, small fluctuations can trigger larger responses, reflecting increased system sensitivity.
+
+In the high-load regime ($\lambda = 6$, $\alpha = 0.2$), avalanche events become larger and more frequent. The system exhibits sustained congestion, and cascade-like behavior dominates. This indicates that the system has transitioned into an unstable state.
+
+\subsection{Relation to Connectivity}
+
+The emergence of avalanche behavior is strongly linked to the connectivity structure of the system. The sequential flow:
+
+[
+\text{Queue} \rightarrow \text{Admission} \rightarrow \text{Beds} \rightarrow \text{Discharge}
+]
+
+creates interdependence between different components.
+
+A delay in discharge reduces available capacity, which restricts admissions. This leads to an increase in queue size, which further amplifies system pressure. Such feedback loops allow local disturbances to propagate across the system, resulting in avalanche events.
+
+As system load increases, this connectivity becomes more tightly coupled, reducing the system's ability to absorb fluctuations and increasing the likelihood of cascade behavior.
+
+\subsection{Self-Organized Criticality}
+
+The system exhibits qualitative features of self-organized criticality (SOC), particularly in the near-critical regime.
+
+SOC systems are characterized by:
+\begin{itemize}
+\item Emergence of cascade events without external tuning
+\item Sensitivity to small perturbations
+\item Absence of a characteristic event size
+\end{itemize}
+
+In this model, as the arrival rate increases, the system naturally evolves toward a critical state where avalanche events of different sizes are observed. This behavior is most evident in the moderate load scenario.
+
+However, the system does not exhibit perfect power-law scaling in avalanche distributions, as indicated by weak statistical fits. This suggests that while the system demonstrates SOC-like behavior, it does not fully satisfy all criteria of classical self-organized critical systems.
+
+\subsection{Interpretation}
+
+The analysis shows that avalanche behavior is not random but emerges from the interaction between system structure and operational conditions.
+
+At low load, the system remains stable and resilient. As load increases, the system approaches a critical threshold where small disturbances can lead to large responses. Beyond this threshold, the system becomes unstable and collapses.
+
+This highlights that system failure is not caused by isolated factors, but emerges from collective interactions and feedback mechanisms within the system.
+\section{Discussion}
+
+The simulation results reveal that the behavior of the hospital system is governed primarily by the interaction between demand (arrival rate) and system capacity, rather than any single isolated factor.
+
+In the low-load regime, the system remains stable because available capacity acts as a buffer against stochastic fluctuations. Even when behavioral inefficiencies are introduced, their impact is limited due to the presence of sufficient slack in the system.
+
+As the arrival rate increases, the system transitions into a near-critical regime. In this state, the system becomes highly sensitive to small perturbations. Minor variations in arrival or discharge processes lead to disproportionately large fluctuations in queue size. This behavior arises due to the reduction of available capacity, which weakens the system's ability to absorb disturbances.
+
+At high load, the system enters a super-critical regime characterized by persistent congestion and collapse. Bed occupancy saturates, and the queue grows continuously without recovery. Importantly, this collapse is not caused solely by high demand or inefficiency, but by their interaction through feedback mechanisms.
+
+Behavioral inefficiency, represented by parameter $\alpha$, plays a secondary but amplifying role. While it does not independently cause system failure at low load, it accelerates the onset of instability at higher loads. This highlights that local decision-making, although individually rational, can collectively degrade system performance.
+
+The results also demonstrate that avalanche-like events emerge naturally as the system approaches capacity limits. These events are a manifestation of interconnected dynamics and feedback loops, rather than external shocks.
+
+\section{Conclusion}
+
+This study demonstrates that hospital patient flow exhibits key characteristics of a complex adaptive system, including nonlinearity, feedback-driven dynamics, and emergent behavior.
+
+The system transitions through distinct operational regimes as demand increases:
+\begin{itemize}
+\item A stable regime with negligible congestion
+\item A near-critical regime with strong fluctuations and avalanche events
+\item A super-critical regime characterized by persistent overload and system collapse
+\end{itemize}
+
+Avalanche analysis shows that congestion events are not isolated but arise from the propagation of disturbances through interconnected system components. The presence of feedback loops between occupancy and discharge dynamics plays a crucial role in amplifying these effects.
+
+While the system exhibits qualitative features of self-organized criticality, strict power-law behavior is not observed. This suggests that real-world systems may display partial critical behavior without fully satisfying ideal theoretical conditions.
+
+Overall, the findings highlight that system-level performance emerges from the interaction of structural constraints and local decision-making. Improving system resilience therefore requires not only increasing capacity but also understanding and managing feedback mechanisms within the system.
+
+\section*{Acknowledgment}
+
+The author acknowledges the use of the following research article for conceptual understanding of complexity science in healthcare systems:
+
+\begin{itemize}
+\item Wright, M. (2024). \textit{A need for systems thinking and the appliance of (complexity) science in healthcare}. Future Healthcare Journal, 11, 100185.
+\end{itemize}
+
+This article provided key insights into hospitals as complex adaptive systems, highlighting concepts such as nonlinearity, feedback loops, system-level behavior, and the role of patient flow in determining system performance.
+
+The author also acknowledges the guidance and course material provided by the instructor, Rajesh Khanna, as part of the course \textit{Complexity Science in Chemical Industry (CLL798)}, which formed the foundation for this project.
+
+Additionally, AI-based tools, including ChatGPT, were used to assist in developing the simulation model, refining the algorithm, improving code structure, enhancing data visualization, and structuring the manuscript. All outputs were critically reviewed and adapted to ensure accuracy and relevance.
+
+\vspace{0.5cm}
+
+\section*{Appendix: Prompts Used}
+
+The following prompts were used during the development of the project:
+
+\begin{itemize}
+
+
+\item "Design a hospital patient flow model incorporating stochastic arrivals, queue dynamics, bed occupancy constraints, and discharge processes."
+
+\item "Explain how hospitals can be modeled as complex adaptive systems using concepts like emergence, feedback loops, and nonlinearity."
+
+\item "Generate Python code to simulate patient arrivals using a Poisson process and dynamically update queue size and bed occupancy."
+
+\item "How to incorporate behavioral inefficiency in discharge decisions using a parameter $\alpha$, and how it affects system dynamics?"
+
+\item "How to include congestion feedback in discharge rate using system occupancy and parameter $\beta$?"
+
+\item "Define avalanche size in terms of queue dynamics and compute it from simulation data."
+
+\item "How to analyze avalanche size distributions and interpret them in the context of criticality and cascading failures?"
+
+\item "Explain self-organized criticality and how it can be observed qualitatively in simulation-based systems."
+
+\item "How to structure a research manuscript including abstract, introduction, model description, methodology, results, and discussion sections?"
+
+\item "Improve LaTeX formatting for figures, including subfigures, alignment, and removal of excessive white space."
+
+\item "Refine interpretation of simulation results to distinguish between stable, near-critical, and collapse regimes."
+
+\item "Explain the role of connectivity in propagating disturbances and generating avalanche behavior in flow-based systems."
+
+\end{itemize}
+
+
+\end{document}
